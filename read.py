@@ -3,10 +3,11 @@
 import sys
 import re
 import xml.etree.ElementTree as ET
+import xml.sax.saxutils as saxutils
 
 
 def output_terms(file):
-    output_file = open("terms.txt", 'w+')
+    output_file = open("data/output/terms.txt", 'w+')
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         # Created boolean var. to check if the elements of the child have non-empty data
@@ -46,7 +47,7 @@ def output_terms(file):
             if len(new_subj_list) > 0:  # If the list of words is greater than 0
                 for word in new_subj_list:  # Go through the list and print each word out in the form above
                     output_file.write("{}".format(subject.tag[0] + "-" + word + ":" + row + "\n"))
-    
+
         # Write out the body info next word by word each on a new line, example: b-good:11 as form (b-word:row#)
         if body_check is True:  # Element is not empty
             if len(new_body_list) > 0:  # If the list of words is greater than 0
@@ -56,10 +57,10 @@ def output_terms(file):
     output_file.close()
 
 
-def output_emails(input_file):
-    output_file = open("emails.txt", 'w+')  # Open a new file which we will write to
+def output_emails(file):
+    output_file = open("data/output/emails.txt", 'w+')  # Open a new file which we will write to
 
-    for mail in input_file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
+    for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         # Created boolean var. to check if the elements of the child have non-empty data
         receiver_check = False
         cc_check = False
@@ -108,7 +109,7 @@ def output_emails(input_file):
 
 
 def output_dates(file):
-    output_file = open("dates.txt", 'w+')  # Open a new file which we will write to
+    output_file = open("data/output/dates.txt", 'w+')  # Open a new file which we will write to
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         row = mail.find('row').text  # Find the element via the tag 'row' and convert it to text
@@ -118,15 +119,15 @@ def output_dates(file):
     output_file.close()  # Close the output file once we're done writing and reading to it
 
 
-def output_recs(file, doc):
-    output_file = open("recs.txt", 'w+')  # Open a new file which we will write to
+def output_recs(file):
+    output_file = open("data/output/recs.txt", 'w+')  # Open a new file which we will write to
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         row = mail.find('row').text  # Find the element via the tag 'row' and convert it to text
-
-        line = ET.tostring(mail, encoding='UTF-8', method="xml")
-
-        output_file.write("{}:{}\n".format(row, line))
+        line = ET.tostring(mail, encoding='unicode', method='text')
+        field = saxutils.escape(line)
+        test = saxutils.escape(field)
+        print(test)
 
     output_file.close()
 
@@ -135,22 +136,23 @@ def main():
     file_name = ''  # File Name is blank for now
     if len(sys.argv) == 2:
         try:
-            file_name = sys.argv[1]  # File name is set to command line argument given by user
+            file_name = "data/input/" + sys.argv[1]  # File name is set to command line argument given by user
             file = open(file_name, 'r')  # Open file with file name given by user as a command line argument
 
             doc = ET.parse(file.name)
             root = doc.getroot()
 
-            output_terms(root)
-            output_emails(root)
-            output_dates(root)
-            output_recs(root, doc)
+            output_terms(doc)
+            output_emails(doc)
+            output_dates(doc)
+            output_recs(root)
 
             file.close()
         except(FileNotFoundError, IOError):
             print("Wrong file or file path")
     else:
-        print("Invalid format, type: 'python read.py xml_file_name'")  # No data file is given by user via command line argument
+        print(
+            "Invalid format, type: 'python read.py xml_file_name'")  # No data file is given by user via command line argument
 
 
 if __name__ == "__main__":
