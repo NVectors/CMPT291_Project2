@@ -1,16 +1,17 @@
 # Run...
 # > chmod u+x phase02.sh
 # > ./phase02.sh
-# Make sure to install: "sudo apt-get install db-util"
 
-# Remove Index database files if they are there
+# make sure to install: "sudo apt-get install db-util"
+
+# Remove db files if they are there
+rm data/indexes/re.idx
 rm data/indexes/te.idx
 rm data/indexes/em.idx
 rm data/indexes/da.idx
-rm data/indexes/re.idx
-rm data/indexes/tests/*
+rm data/indexes/test/*
 
-# # Create db files
+# Create db files
 # db_create -T -t hash data.indexes/re.idx
 # db_load -c dupsort=1 -T -t btree data/indexes/te.idx
 # db_load -c dupsort=1 -T -t btree data/indexes/em.idx
@@ -21,8 +22,12 @@ rm data/indexes/tests/*
 # touch data/indexes/em.idx
 # touch data/indexes/da.idx
 
-for file_name in $(ls data/output/);
-  sort -u -o data/output/$ {file_name} data/output/$ {file_name}
+
+sort -u data/output/recs.txt > data/output/recs.txt
+sort -u data/output/terms.txt > data/output/terms.txt
+sort -u data/output/emails.txt > data/output/emails.txt
+sort -u data/output/dates.txt > data/output/dates.txt
+
 
 # Load each result from stdout into it's apporpriate index
 perl break.pl < data/output/recs.txt | db_load -T -t hash data/indexes/re.idx
@@ -31,7 +36,7 @@ perl break.pl < data/output/emails.txt | db_load -T -c dupsort=1 -t btree data/i
 perl break.pl < data/output/dates.txt | db_load -T -c dupsort=1 -t btree data/indexes/da.idx
 
 # Test results of each index, outputted into the tests folder (remove when submitting)
-db_dump -p -f data/indexes/tests/re_results.txt data/indexes/re.idx
-db_dump -p -f data/indexes/tests/te_results.txt data/indexes/te.idx
-db_dump -p -f data/indexes/tests/em_results.txt data/indexes/em.idx
-db_dump -p -f data/indexes/tests/da_results.txt data/indexes/da.idx
+db_dump -p -f data/indexes/tests/ad_res.txt data/indexes/ad.idx
+db_dump -p -f data/indexes/tests/tm_res.txt data/indexes/tm.idx
+db_dump -p -f data/indexes/tests/da_res.txt data/indexes/da.idx
+db_dump -p -f data/indexes/tests/pr_res.txt data/indexes/pr.idx
