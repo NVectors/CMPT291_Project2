@@ -23,10 +23,10 @@ rm data/indexes/test/*
 # touch data/indexes/da.idx
 
 
-sort -u data/output/recs.txt > data/output/recs.txt
-sort -u data/output/terms.txt > data/output/terms.txt
-sort -u data/output/emails.txt > data/output/emails.txt
-sort -u data/output/dates.txt > data/output/dates.txt
+sort -u -o data/output/$ recs.txt > data/output/$ recs.txt
+sort -u -o data/output/$ terms.txt > data/output/$ terms.txt
+sort -u -o data/output/$ emails.txt > data/output/$ emails.txt
+sort -u -o data/output/$ dates.txt > data/output/$ dates.txt
 
 
 # Load each result from stdout into it's apporpriate index
@@ -36,7 +36,7 @@ perl break.pl < data/output/emails.txt | db_load -T -c dupsort=1 -t btree data/i
 perl break.pl < data/output/dates.txt | db_load -T -c dupsort=1 -t btree data/indexes/da.idx
 
 # Test results of each index, outputted into the tests folder (remove when submitting)
-db_dump -p -f data/indexes/tests/ad_res.txt data/indexes/ad.idx
-db_dump -p -f data/indexes/tests/tm_res.txt data/indexes/tm.idx
-db_dump -p -f data/indexes/tests/da_res.txt data/indexes/da.idx
-db_dump -p -f data/indexes/tests/pr_res.txt data/indexes/pr.idx
+db_dump -p -f data/indexes/test/ad_res.txt data/indexes/ad.idx
+db_dump -p -f data/indexes/test/tm_res.txt data/indexes/tm.idx
+db_dump -p -f data/indexes/test/da_res.txt data/indexes/da.idx
+db_dump -p -f data/indexes/test/pr_res.txt data/indexes/pr.idx
