@@ -2,7 +2,7 @@
 
 import sys
 import re  # Regex to match str characters to [a-z-A-Z-0-9_-] only
-import xml.etree.ElementTree as ET  # Built in Python library to parse through the XML file
+import xml.etree.cElementTree as ET  # Built in Python library to parse through the XML file
 import xml.sax.saxutils as saxutils  # For escape characters, default < > & is in the library can add \n ' " via dict
 
 
