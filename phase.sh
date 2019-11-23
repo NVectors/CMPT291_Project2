@@ -36,7 +36,7 @@ perl break.pl < data/output/emails.txt | db_load -T -c dupsort=1 -t btree data/i
 perl break.pl < data/output/dates.txt | db_load -T -c dupsort=1 -t btree data/indexes/da.idx
 
 # Test results of each index, outputted into the tests folder (remove when submitting)
-db_dump -p -f data/indexes/test/ad_res.txt data/indexes/ad.idx
-db_dump -p -f data/indexes/test/tm_res.txt data/indexes/tm.idx
-db_dump -p -f data/indexes/test/da_res.txt data/indexes/da.idx
-db_dump -p -f data/indexes/test/pr_res.txt data/indexes/pr.idx
+db_dump -p -f data/indexes/test/ad_res.txt data/indexes/re.idx
+db_dump -p -f data/indexes/test/tm_res.txt data/indexes/te.idx
+db_dump -p -f data/indexes/test/da_res.txt data/indexes/em.idx
+db_dump -p -f data/indexes/test/pr_res.txt data/indexes/da.idx
