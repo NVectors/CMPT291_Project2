@@ -10,8 +10,8 @@ recDB = db.DB()
 indexPath = "data/indexes/"
 
 # Open Index Databases
-termDB.open(indexPath + 'ta.idx')
-emailDB.open(indexPath + 'ea.idx')
+termDB.open(indexPath + 'te.idx')
+emailDB.open(indexPath + 'em.idx')
 dateDB.open(indexPath + 'da.idx')
 recDB.open(indexPath + 're.idx')
 
@@ -20,6 +20,7 @@ termCursor = termDB.cursor()
 emailDB = emailDB.cursor()
 dateDB = dateDB.cursor()
 recDB = recDB.cursor()
+
 
 # Close Databases when done
 termDB.close()
