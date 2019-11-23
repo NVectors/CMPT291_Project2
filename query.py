@@ -21,6 +21,18 @@ emailDB = emailDB.cursor()
 dateDB = dateDB.cursor()
 recDB = recDB.cursor()
 
+iter = termCursor.first()
+while (iter):
+    print(termCursor.count()) #prints no. of rows that have the same key for the current key-value pair referred by the cursor
+    print(iter)
+
+    #iterating through duplicates
+    dup = termCursor.next_dup()
+    while(dup!=None):
+        print(dup)
+        dup = termCursor.next_dup()
+
+    iter = termCursor.next()
 
 # Close Databases when done
 termDB.close()
