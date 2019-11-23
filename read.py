@@ -7,7 +7,7 @@ import xml.sax.saxutils as saxutils
 
 
 def output_terms(file):
-    output_file = open("data/output/terms.txt", 'w+')
+    output_file = open("data/output/10-terms.txt", 'w+')
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         # Created boolean var. to check if the elements of the child have non-empty data
@@ -58,7 +58,7 @@ def output_terms(file):
 
 
 def output_emails(file):
-    output_file = open("data/output/emails.txt", 'w+')  # Open a new file which we will write to
+    output_file = open("data/output/10-emails.txt", 'w+')  # Open a new file which we will write to
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         # Created boolean var. to check if the elements of the child have non-empty data
@@ -109,7 +109,7 @@ def output_emails(file):
 
 
 def output_dates(file):
-    output_file = open("data/output/dates.txt", 'w+')  # Open a new file which we will write to
+    output_file = open("data/output/10-dates.txt", 'w+')  # Open a new file which we will write to
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         row = mail.find('row').text  # Find the element via the tag 'row' and convert it to text
@@ -120,7 +120,7 @@ def output_dates(file):
 
 
 def output_recs(file):
-    output_file = open("data/output/recs.txt", 'w+')  # Open a new file which we will write to
+    output_file = open("data/output/10-recs.txt", 'w+')  # Open a new file which we will write to
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         row = mail.find('row').text  # Find the element via the tag 'row' and convert it to text
