@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import sys
-import re
-import xml.etree.ElementTree as ET
-import xml.sax.saxutils as saxutils
+import re  # Regex to match str characters to [a-z-A-Z-0-9_-] only
+import xml.etree.ElementTree as ET  # Built in Python library to parse through the XML file
+import xml.sax.saxutils as saxutils  # For escape characters, default < > & is in the library can add \n ' " via dict
 
 
 def output_terms(file):
-    output_file = open("data/output/10-terms.txt", 'w+')
+    output_file = open("data/output/terms.txt", 'w+')
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         # Created boolean var. to check if the elements of the child have non-empty data
@@ -58,7 +58,7 @@ def output_terms(file):
 
 
 def output_emails(file):
-    output_file = open("data/output/10-emails.txt", 'w+')  # Open a new file which we will write to
+    output_file = open("data/output/emails.txt", 'w+')  # Open a new file which we will write to
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         # Created boolean var. to check if the elements of the child have non-empty data
@@ -109,7 +109,7 @@ def output_emails(file):
 
 
 def output_dates(file):
-    output_file = open("data/output/10-dates.txt", 'w+')  # Open a new file which we will write to
+    output_file = open("data/output/dates.txt", 'w+')  # Open a new file which we will write to
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         row = mail.find('row').text  # Find the element via the tag 'row' and convert it to text
@@ -120,14 +120,32 @@ def output_dates(file):
 
 
 def output_recs(file):
-    output_file = open("data/output/10-recs.txt", 'w+')  # Open a new file which we will write to
+    output_file = open("data/output/recs.txt", 'w+')  # Open a new file which we will write to
 
     for mail in file.findall('mail'):  # For every line (child of root element) that starts with the tag <mail>
         row = mail.find('row').text  # Find the element via the tag 'row' and convert it to text
-        line = ET.tostring(mail, encoding='unicode', method='text')
-        field = saxutils.escape(line)
-        test = saxutils.escape(field)
-        print(test)
+        date = mail.find('date').text  # Find the element via the tag 'date' and convert it to test
+        sender = mail.find('from').text
+        receiver = mail.find('to').text
+        subject = mail.find('subj').text
+        cc = mail.find('cc').text
+        bcc = mail.find('bcc').text
+        body = mail.find('body').text
+
+        empty_subj = False
+        if subject is None:
+            empty_subj = True
+        else:
+            new_subject = saxutils.escape(subject,{'\n':'&#10;',"'":'&apos;','"':'&quot;'})
+
+        empty_body = False
+        if body is None:
+            empty_body = True
+        else:
+            new_body = saxutils.escape(body,{'\n':'&#10;',"'":'&apos;','"':'&quot;',})
+
+        output_file.write("{}:<mail><row>{}</row><date>{}</date><from>{}</from><to>{}</to><subj>{}</subj><cc>{}</cc><bcc>{}</bcc><body>{}</body></mail>\n".format(
+            row, row, date, sender, "" if receiver is None else receiver, "" if empty_subj is True else new_subject, "" if cc is None else cc, "" if bcc is None else bcc, "" if empty_body is True else new_body))
 
     output_file.close()
 
