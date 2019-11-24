@@ -31,6 +31,7 @@ NUMBERS = "1234567890"
 DATE_CMP = [':', '<', '>', '<=', '>=']
 WHITESPACE = " \t\n"
 EMAIL_PRE = ["from", "to", "cc", "bcc"]
+TERM_PRE = ["subj", "body"]
 
 
 """
@@ -195,6 +196,79 @@ def is_email_query(Str):
 
 
 """
+Desc    : Check if Str is a term
+returns : None | index of last char in term
+"""
+def is_term(Str):
+    end = 0
+    for c in range(len(Str)):
+        if not Str[c].isalnum():
+            break
+        end += 1
+    
+    if end < 1:
+        return None
+
+    return end
+
+
+"""
+Desc    : Check if string is a term prefix
+returns : None | (operator, index of last char in term prefix)
+"""
+def is_term_pre(Str):
+    if Str[0:5] not in TERM_PRE:
+        return None
+    end = 5
+    for c in range(5, len(Str)):
+        if c not in WHITESPACE:
+            break
+        end += 1
+    if Str[end] != ':':
+        return None
+
+    return (Str[0:5], end)
+
+
+"""
+Desc    : Checks if Str is a term query.
+returns : None | (index of last char in term query, (pre, term, post) )
+"""
+def is_term_query(Str):
+    pre = is_term_pre(Str)
+    end = 0
+    if not pre:
+        term_start = 0
+        pre_val = False
+    else:
+        pre_val = pre[0]
+        term_start = pre[1] + 1
+        end += pre[1]
+
+    for c in range(term_start, len(Str)):
+        if Str[c] not in WHITESPACE:
+            term_start = c
+            break
+    term_end = is_term(Str[term_start :])
+    if not term_end:
+        return None
+
+    if term_end +1 < len(Str):
+        suf = Str[term_end + 1] == '%'
+    else:
+        suf = False
+    
+    if suf:
+        end += 1
+
+    end += term_end
+
+    val = (pre_val, Str[term_start : term_end + 1], suf)
+
+    return (end, val)
+
+
+"""
 Desc    : Recurrsively parse a string, getting nessesary info to perform a query
 returns : [(query_type, val), ...]
 """
@@ -214,10 +288,14 @@ def rec_parse(Str):
         print(email[0])
         return [("email", email[1])] + rec_parse(Str[email[0] + 1 :])
 
+    term = is_term_query(Str)
+    if term:
+        return[("term", term[1])] + rec_parse(Str[term[0] + 1 : ])
+
     if Str[0] in WHITESPACE:
         return rec_parse(Str[1:])
 
 
-print(is_date_query("date>2001/03/10"))
+print(rec_parse("confidential%"))
 
 
