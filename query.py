@@ -27,35 +27,33 @@ dateCursor = dateDB.cursor()
 recCursor = recDB.cursor()
 
 
+def termSearch(queryTerm, cursor):
+    # TODO Range search if we have wild card % example confidential% as in confidential, confidentially, confidentiality
+    # TODO termSearch
+    wildcard = queryTerm[-1]
 
-def termSearch(queryTerm, db, cursor):
-        # TODO Range search if we have wild card % example confidential% as in confidential, confidentially, confidentiality
-        # TODO termSearch
-        wildcard = queryTerm[-1]
+    if wildcard == '%':
+        pass
+    else:
+        query_output = set()
 
-        if wildcard == '%':
-                pass
-        else:
-            output = set()
+        result = cursor.set(queryTerm.encode("UTF-8"))
+        row_ids = result[1].decode('UTF-8').split(',')
+        term_id = row_ids[0]
 
-            result = cursor.set_range(queryTerm.encode("UTF-8"))
+        query_output.add(term_id)
 
-            row_ids = result[1].decode('UTF-8').split(',')
-            term_id = row_ids[0]
+        dup = cursor.next_dup()
+        while dup is not None:
+                dup_row_ids = dup[1].decode('UTF-8').split(',')
+                dup_term_id = dup_row_ids[0]
+                query_output.add(dup_term_id)
+                dup = cursor.next_dup()
 
-            output.add(term_id)
-
-            dup = cursor.next_dup()
-            while dup is not None:
-                    dup_row_ids = dup[1].decode('UTF-8').split(',')
-                    dup_term_id = dup_row_ids[0]
-                    output.add(dup_term_id)
-                    dup = cursor.next_dup()
+        return query_output
 
 
-            return output
-
-def output(id_set,cursor, outputType):
+def output(id_set, cursor, outputType):
     if not id_set:
         print("No results")
         return
@@ -66,7 +64,8 @@ def output(id_set,cursor, outputType):
         if outputType.lower() == "brief":
             parser.rec_parse(rec)
 
-test = termSearch('confidential', termDB, termCursor)
+
+test = termSearch('s-confidential', termCursor)
 output(test, recCursor, "Brief")
 
 # Close Databases when done
@@ -74,5 +73,3 @@ termDB.close()
 emailDB.close()
 dateDB.close()
 recDB.close()
-
-
