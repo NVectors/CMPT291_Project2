@@ -269,8 +269,32 @@ def is_term_query(Str):
 
 
 """
+Desc    : Check if string is a mode change
+returns : (index of last char in mode change, mode)
+"""
+def is_mode_change(Str):
+    if Str[0:7] != "output=":
+        return None
+
+    val = None
+    end = None
+    
+    if Str[7:11] == "full":
+        val = "full"
+        end = 10
+    if Str[7:12] == "brief":
+        val = "brief"
+        end = 11
+
+    if not end or not end:
+        return None
+
+    return (end, val)
+
+
+"""
 Desc    : Recurrsively parse a string, getting nessesary info to perform a query
-returns : [(query_type, val), ...]
+returns : None | [(query_type, val), ...]
 """
 def rec_parse(Str):
     print("len =", len(Str))
@@ -278,24 +302,39 @@ def rec_parse(Str):
     if len(Str) == 0:
         return []
 
-    date = is_date_query(Str)
-    if date:
-        return [("date", date[1])] + rec_parse(Str[date[0] + 1 :])
-
-
-    email = is_email_query(Str)
-    if email:
-        print(email[0])
-        return [("email", email[1])] + rec_parse(Str[email[0] + 1 :])
-
-    term = is_term_query(Str)
-    if term:
-        return[("term", term[1])] + rec_parse(Str[term[0] + 1 : ])
-
     if Str[0] in WHITESPACE:
         return rec_parse(Str[1:])
 
+    date = is_date_query(Str)
+    if date:
+        print("date")
+        ret = rec_parse(Str[date[0] + 1 :])
+        if ret == None:
+            return None
+        return [("date", date[1])] + ret
 
-print(rec_parse("confidential%"))
+    mode = is_mode_change(Str)
+    if mode:
+        print("mode")
+        ret = rec_parse(Str[mode[0] + 1 :])
+        if ret == None: 
+            return None
+        return [("mode", mode[1])] + ret
+
+    email = is_email_query(Str)
+    if email:
+        print("email")
+        ret = rec_parse(Str[email[0] + 1 :])
+        if ret == None:
+            return None
+        return [("email", email[1])] + ret
+
+    term = is_term_query(Str)
+    if term:
+        print("term")
+        ret = rec_parse(Str[term[0] + 1 : ])
+        if ret == None:
+            return None
+        return [("term", term[1])] + ret
 
 
