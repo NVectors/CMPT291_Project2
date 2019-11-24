@@ -3,7 +3,7 @@
 
 from bsddb3 import db
 import sys
-import query_parser
+import query_parser as parser
 
 # Instances of BerkeleyDB
 termDB = db.DB()
@@ -27,15 +27,52 @@ dateCursor = dateDB.cursor()
 recCursor = recDB.cursor()
 
 
-class EmailQuery:
-    def __int__(self, searchEmail, keyword):
-        self.searchEmail = searchEmail
-        self.keyword = keyword
+
+def termSearch(queryTerm, db, cursor):
+        # TODO Range search if we have wild card % example confidential% as in confidential, confidentially, confidentiality
+        # TODO termSearch
+        wildcard = queryTerm[-1]
+
+        if wildcard == '%':
+                pass
+        else:
+            output = set()
+
+            result = cursor.set_range(queryTerm.encode("UTF-8"))
+
+            row_ids = result[1].decode('UTF-8').split(',')
+            term_id = row_ids[0]
+
+            output.add(term_id)
+
+            dup = cursor.next_dup()
+            while dup is not None:
+                    dup_row_ids = dup[1].decode('UTF-8').split(',')
+                    dup_term_id = dup_row_ids[0]
+                    output.add(dup_term_id)
+                    dup = cursor.next_dup()
 
 
+            return output
+
+def output(id_set,cursor, outputType):
+    if not id_set:
+        print("No results")
+        return
+
+    for id in id_set:
+        result = cursor.set(id.encode('UTF-8'))
+        rec = result[1].decode('UTF-8')
+        if outputType.lower() == "brief":
+            parser.rec_parse(rec)
+
+test = termSearch('confidential', termDB, termCursor)
+output(test, recCursor, "Brief")
 
 # Close Databases when done
 termDB.close()
 emailDB.close()
 dateDB.close()
 recDB.close()
+
+
