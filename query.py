@@ -3,6 +3,7 @@
 
 from bsddb3 import db
 from datetime import datetime
+import datetime as dt
 import query_parser as parser
 
 # Instances of BerkeleyDB
@@ -45,7 +46,13 @@ def query(q):
             continue
 
         if op[0] == "date":
-            query_date(op[1])
+            new_ids = query_date(op[1])
+            if len(ids) < 1:
+                ids = new_ids
+            else:
+                ids = ids.intersection(new_ids)
+            continue
+
             #if len(ids) < 1:
             #    ids = new_ids
 
@@ -115,7 +122,6 @@ email in form (operator, email)
 
 
 def query_email(eml):
-    print("email =", eml)
     if eml[0] == "from":
         search = [b"from-"]
     elif eml[0] == 'to':
@@ -149,8 +155,11 @@ def query_date(dte):
 
     query_output = set()
 
-    if operator in (":", ">", ">=", "<="):
-        result = dateCursor.set(date.encode('UTF-8'))
+    if operator in (":", ">", ">=", "<=", "<"):
+        if operator == "<" or operator == "<=":
+            result = dateCursor.first()
+        else:
+            result = dateCursor.set(date.encode('UTF-8'))
 
         while result is not None:
             row_value = result[0].decode('UTF-8').split(',')
@@ -162,10 +171,9 @@ def query_date(dte):
             sd2 = date_value.split('/')
 
             #TODO what the fuck
-            date1 = datetime.date(sd1[0], sd1[1], sd1[2])
-            date2 = datetime.date(sd2[0], sd2[1], sd2[2])
+            date1 = dt.date(int(sd1[0]), int(sd1[1]), int(sd1[2]))
+            date2 = dt.date(int(sd2[0]), int(sd2[1]), int(sd2[2]))
 
-            print(date1, date2)
 
             if operator == ':':
                 if date2 == date1:
