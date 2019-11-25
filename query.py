@@ -149,8 +149,9 @@ def query_date(dte):
 
     query_output = set()
 
-    if operator in ("=", ">", ">="):
+    if operator in ("", ">", ">=", "<="):
         result = dateCursor.set(date.encode('UTF-8'))
+        
         while result is not None:
             row_value = result[0].decode('UTF-8').split(',')
             date_value = row_value[0]
@@ -159,15 +160,28 @@ def query_date(dte):
 
             date1 = dt.strptime(date, "%Y/%m/%d")
             date2 = dt.strptime(date_value, "%Y/%m/%d")
-            if operator == '=':
+            
+            if operator == '':
                 if date2 == date1:
                     query_output.add(date_id)
-            elif operator == '>=':
-                if date2 >= date1:
-                    query_output.add(date_id)
+                    
             elif operator is '>':
                 if date2 > date1:
                     query_output.add(date_id)
+                              
+            elif operator is '<':
+                if date2 < date1:
+                    query_output.add(date_id)
+                    
+            elif operator == '>=':
+                if date2 >= date1:
+                    query_output.add(date_id)
+                    
+            elif operator == '<=':
+                if date2 <= date1:
+                    query_output.add(date_id)
+            else:
+                break
 
             result = dateCursor.next()
 
