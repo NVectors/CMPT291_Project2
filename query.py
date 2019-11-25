@@ -32,23 +32,22 @@ def query(q):
     result = []
     for op in operations:
         if op[0] == "email":
-            #do call email query stuff here
+            # do call email query stuff here
             # Maybe result.append("My result string")
             pass
 
         if op[0] == "date":
-            #do date stuff
+            # do date stuff
             pass
 
         if op[0] == "mode":
-            #do mode stuff
+            # do mode stuff
             pass
 
         if op[0] == "term":
             # Do term stuff 
 
             pass
-
 
 
 def termSearch(queryTerm, cursor):
@@ -69,28 +68,48 @@ def termSearch(queryTerm, cursor):
 
         dup = cursor.next_dup()
         while dup is not None:
-                dup_row_ids = dup[1].decode('UTF-8').split(',')
-                dup_term_id = dup_row_ids[0]
-                query_output.add(dup_term_id)
-                dup = cursor.next_dup()
+            dup_row_ids = dup[1].decode('UTF-8').split(',')
+            dup_term_id = dup_row_ids[0]
+            query_output.add(dup_term_id)
+            dup = cursor.next_dup()
 
         return query_output
 
 
-def output(id_set, cursor, outputType):
-    if not id_set:
-        print("No results")
-        return
+def emailQuery(queryTerm, cursor):
+    query_output = set()
 
-    for id in id_set:
-        result = cursor.set(id.encode('UTF-8'))
-        rec = result[1].decode('UTF-8')
-        if outputType.lower() == "brief":
-            parser.rec_parse(rec)
+    result = cursor.set(queryTerm.encode("UTF-8"))
+    row_ids = result[1].decode('UTF-8').split(',')
+    email_id = row_ids[0]
+
+    query_output.add(email_id)
+
+    dup = cursor.next_dup()
+    while dup is not None:
+        dup_row_ids = dup[1].decode('UTF-8').split(',')
+        dup_email_id = dup_row_ids[0]
+        query_output.add(dup_email_id)
+        dup = cursor.next_dup()
+
+    return query_output
+
+def dateQuery(queryTerm, cursor):
+    query_output = set()
+
+def recSearch(index, cursor):
+    result = cursor.set(index.encode("UTF-8"))
+    records = result[1].decode('UTF-8').split(',')
+    record = records[0]
+    print(record)
 
 
-test = termSearch('s-confidential', termCursor)
-output(test, recCursor, "Brief")
+# test = termSearch('s-confidential', termCursor)
+# for t in test:
+#    recSearch(t,recCursor)
+
+test = emailQuery('to-phillip.allen@enron.com', emailCursor)
+print(len(test))
 
 # Close Databases when done
 termDB.close()
