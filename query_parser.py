@@ -217,17 +217,17 @@ Desc    : Check if string is a term prefix
 returns : None | (operator, index of last char in term prefix)
 """
 def is_term_pre(Str):
-    if Str[0:5] not in TERM_PRE:
+    if Str[0:4] not in TERM_PRE:
         return None
-    end = 5
+    end = 4
     for c in range(5, len(Str)):
-        if c not in WHITESPACE:
+        if Str[c] not in WHITESPACE:
             break
         end += 1
     if Str[end] != ':':
         return None
 
-    return (Str[0:5], end)
+    return (Str[0:4], end)
 
 
 """
@@ -249,7 +249,7 @@ def is_term_query(Str):
         if Str[c] not in WHITESPACE:
             term_start = c
             break
-    term_end = is_term(Str[term_start :])
+    term_end = is_term(Str[term_start :]) + term_start
     if not term_end:
         return None
 
@@ -270,7 +270,7 @@ def is_term_query(Str):
 
 """
 Desc    : Check if string is a mode change
-returns : (index of last char in mode change, mode)
+returns : (index of last char in mode change, modeeys and the full email record as data, (2) a)
 """
 def is_mode_change(Str):
     if Str[0:7] != "output=":

@@ -11,6 +11,8 @@ emailDB = db.DB()
 dateDB = db.DB()
 recDB = db.DB()
 
+termDB.set_flags(db.DB_DUP)
+
 # Create path to index files
 indexPath = "data/indexes/"
 
@@ -27,9 +29,11 @@ dateCursor = dateDB.cursor()
 recCursor = recDB.cursor()
 
 
+
+
 def query(q):
     operations = parser.rec_parse(q)
-    result = []
+    result = ['brief']
     for op in operations:
         if op[0] == "email":
             #do call email query stuff here
@@ -41,15 +45,82 @@ def query(q):
             pass
 
         if op[0] == "mode":
-            #do mode stuff
-            pass
+            result[0] = op[1]
+            continue
 
         if op[0] == "term":
-            # Do term stuff 
+            result = result + query_term(op[1])
+            continue
 
-            pass
+    return result
 
 
+"""
+Term in the form (pre, term, post)
+"""
+def query_term(term):
+    if term[0] == "body":
+        search = [b"b-"]
+    elif term[0] == 'subj':
+        search = [b"s-"]
+    else:
+        search = [b"s-", b"b-"]
+
+    result = []
+    last = None
+    for s in search:
+        q = termCursor.set(s + term[1].encode())
+        
+        if not q:
+            continue
+
+        while q:
+            result.append(q[1])
+            q = termCursor.next_dup()
+
+
+        # cursor should be pointing at last exaxt match
+        nxt = termCursor.next()
+        t = term[1].encode()
+        while nxt:
+            if s + t == nxt[0][0 : len(s+t)]:
+                result.append(nxt[1])
+            nxt = termCursor.next()
+
+
+
+    # Got list of row id's now. Translate them to email records.
+    for i in range(len(result)):
+        result[i] = recCursor.set(result[i])[1].decode('utf-8')
+
+    return result
+
+            
+        
+
+
+
+
+def test(s):
+    termCursor = termDB.cursor()
+    f = termCursor.first()
+    #print("cur =", termCursor.current())
+    r = termCursor.set(s.encode())
+    #print("r =", r)
+    #while f:
+    #    f = termCursor.next()
+    #    print(f)
+
+    r = [r]
+    print("count =", termCursor.count())
+    #dup = c.next_dup()
+    #while dup is not None:
+    #    r.append(dup)
+    #    dup = termCursor.next_dup()
+
+    #return r
+
+    
 
 def termSearch(queryTerm, cursor):
     # TODO Range search if we have wild card % example confidential% as in confidential, confidentially, confidentiality
@@ -89,11 +160,11 @@ def output(id_set, cursor, outputType):
             parser.rec_parse(rec)
 
 
-test = termSearch('s-confidential', termCursor)
-output(test, recCursor, "Brief")
+#test = termSearch('s-confidential', termCursor)
+#output(test, recCursor, "Brief")
 
 # Close Databases when done
-termDB.close()
-emailDB.close()
-dateDB.close()
-recDB.close()
+#termDB.close()
+#emailDB.close()
+#dateDB.close()
+#recDB.close()
