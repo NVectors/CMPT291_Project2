@@ -6,23 +6,27 @@ import re
 def main():
 
     while True:
-        nput = input("Query: ").lower()
-        if nput == 'q':
+        user_input = input("Query: ").lower()
+        if user_input == 'q':
             print("Exiting")
             raise SystemExit
 
-        results = query.query(nput)
+        results = query.query(user_input)
         #result = query.test(nput)
         print_results(results)
 
 
 
 def print_results(results):
+    if len(results) < 2:
+        print(("-" * 35) + "No Records" + ("-" * 35))
+        return
     # TODO De-escape data
     if results[0] == 'full':
         full = True
     else:
         full = False
+
 
     for result in results[1:]:
         print("-" * 80)
@@ -46,7 +50,6 @@ def print_results(results):
             except: pass
     
     print("-" * 80)
-
 
 if __name__ == '__main__':
     main()

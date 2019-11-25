@@ -36,17 +36,18 @@ def query(q):
     result = ['brief']
     for op in operations:
         if op[0] == "email":
-            #do call email query stuff here
+            # do call email query stuff here
             # Maybe result.append("My result string")
             pass
 
         if op[0] == "date":
-            #do date stuff
+            # do date stuff
             pass
 
         if op[0] == "mode":
             result[0] = op[1]
             continue
+
 
         if op[0] == "term":
             result = result + query_term(op[1])
@@ -97,31 +98,6 @@ def query_term(term):
 
             
         
-
-
-
-
-def test(s):
-    termCursor = termDB.cursor()
-    f = termCursor.first()
-    #print("cur =", termCursor.current())
-    r = termCursor.set(s.encode())
-    #print("r =", r)
-    #while f:
-    #    f = termCursor.next()
-    #    print(f)
-
-    r = [r]
-    print("count =", termCursor.count())
-    #dup = c.next_dup()
-    #while dup is not None:
-    #    r.append(dup)
-    #    dup = termCursor.next_dup()
-
-    #return r
-
-    
-
 def termSearch(queryTerm, cursor):
     # TODO Range search if we have wild card % example confidential% as in confidential, confidentially, confidentiality
     # TODO termSearch
@@ -140,28 +116,56 @@ def termSearch(queryTerm, cursor):
 
         dup = cursor.next_dup()
         while dup is not None:
-                dup_row_ids = dup[1].decode('UTF-8').split(',')
-                dup_term_id = dup_row_ids[0]
-                query_output.add(dup_term_id)
-                dup = cursor.next_dup()
+            dup_row_ids = dup[1].decode('UTF-8').split(',')
+            dup_term_id = dup_row_ids[0]
+            query_output.add(dup_term_id)
+            dup = cursor.next_dup()
 
         return query_output
 
 
-def output(id_set, cursor, outputType):
-    if not id_set:
-        print("No results")
-        return
+def emailQuery(queryTerm, cursor):
+    query_output = set()
 
-    for id in id_set:
-        result = cursor.set(id.encode('UTF-8'))
-        rec = result[1].decode('UTF-8')
-        if outputType.lower() == "brief":
-            parser.rec_parse(rec)
+    result = cursor.set(queryTerm.encode("UTF-8"))
+    row_ids = result[1].decode('UTF-8').split(',')
+    email_id = row_ids[0]
 
+    query_output.add(email_id)
+
+    dup = cursor.next_dup()
+    while dup is not None:
+        dup_row_ids = dup[1].decode('UTF-8').split(',')
+        dup_email_id = dup_row_ids[0]
+        query_output.add(dup_email_id)
+        dup = cursor.next_dup()
+
+    return query_output
+
+def dateQuery(queryTerm, cursor):
+    query_output = set()
+
+def recSearch(index, cursor):
+    result = cursor.set(index.encode("UTF-8"))
+    records = result[1].decode('UTF-8').split(',')
+    record = records[0]
+    print(record)
+
+
+
+def exit():
+    termDB.close()
+    emailDB.close()
+    dateDB.close()
+    recDB.close()
+
+# test = termSearch('s-confidential', termCursor)
+# for t in test:
+#    recSearch(t,recCursor)
 
 #test = termSearch('s-confidential', termCursor)
 #output(test, recCursor, "Brief")
+
 
 # Close Databases when done
 #termDB.close()
