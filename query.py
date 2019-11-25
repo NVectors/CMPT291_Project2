@@ -2,7 +2,6 @@
 
 
 from bsddb3 import db
-import sys
 import query_parser as parser
 
 from datetime import datetime
@@ -40,11 +39,6 @@ def query(q):
     for op in operations:
         if op[0] == "email":
             new_ids = query_email(op[1])
-            if len(ids) < 1:
-                ids = new_ids
-            else:
-                ids = ids.intersection(new_ids)
-            continue
 
         if op[0] == "date":
             pass
@@ -115,7 +109,7 @@ email in form (operator, email)
 
 
 def query_email(eml):
-    print("email =", eml, type(eml))
+    print("email =", eml)
     if eml[0] == "from":
         search = [b"from-"]
     elif eml[0] == 'to':
@@ -143,7 +137,7 @@ def query_email(eml):
 
 
 def query_date(dte):
-    #TODO Make this query fn
+    # TODO Make this query fn
     operator = dte[0]
     date = dte[1]
 
@@ -151,7 +145,7 @@ def query_date(dte):
 
     if operator in ("", ">", ">=", "<="):
         result = dateCursor.set(date.encode('UTF-8'))
-        
+
         while result is not None:
             row_value = result[0].decode('UTF-8').split(',')
             date_value = row_value[0]
@@ -160,23 +154,23 @@ def query_date(dte):
 
             date1 = dt.strptime(date, "%Y/%m/%d")
             date2 = dt.strptime(date_value, "%Y/%m/%d")
-            
+
             if operator == ':':
                 if date2 == date1:
                     query_output.add(date_id)
-                    
+
             elif operator is '>':
                 if date2 > date1:
                     query_output.add(date_id)
-                              
+
             elif operator is '<':
                 if date2 < date1:
                     query_output.add(date_id)
-                    
+
             elif operator == '>=':
                 if date2 >= date1:
                     query_output.add(date_id)
-                    
+
             elif operator == '<=':
                 if date2 <= date1:
                     query_output.add(date_id)
