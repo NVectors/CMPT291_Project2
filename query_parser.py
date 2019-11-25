@@ -253,8 +253,8 @@ def is_term_query(Str):
     if not term_end:
         return None
 
-    if term_end +1 < len(Str):
-        suf = Str[term_end + 1] == '%'
+    if term_end < len(Str):
+        suf = Str[term_end] == '%'
     else:
         suf = False
     
@@ -263,7 +263,7 @@ def is_term_query(Str):
 
     end += term_end
 
-    val = (pre_val, Str[term_start : term_end + 1], suf)
+    val = (pre_val, Str[term_start : term_end], suf)
 
     return (end, val)
 

@@ -60,6 +60,7 @@ def query(q):
 Term in the form (pre, term, post)
 """
 def query_term(term):
+    print("term =", term)
     if term[0] == "body":
         search = [b"b-"]
     elif term[0] == 'subj':
@@ -79,7 +80,8 @@ def query_term(term):
             result.append(q[1])
             q = termCursor.next_dup()
 
-
+        if not term[2]:
+            continue
         # cursor should be pointing at last exaxt match
         nxt = termCursor.next()
         t = term[1].encode()
