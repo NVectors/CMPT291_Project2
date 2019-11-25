@@ -2,7 +2,6 @@
 
 
 from bsddb3 import db
-from datetime import datetime
 import datetime as dt
 import query_parser as parser
 
@@ -149,7 +148,6 @@ def query_email(eml):
 
 
 def query_date(dte):
-    # TODO Make this query fn
     operator = dte[0]
     date = dte[1]
 
@@ -170,10 +168,8 @@ def query_date(dte):
             sd1 = date.split('/')
             sd2 = date_value.split('/')
 
-            #TODO what the fuck
             date1 = dt.date(int(sd1[0]), int(sd1[1]), int(sd1[2]))
             date2 = dt.date(int(sd2[0]), int(sd2[1]), int(sd2[2]))
-
 
             if operator == ':':
                 if date2 == date1:
