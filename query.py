@@ -182,6 +182,8 @@ def query_date(dte):
             elif operator is '<':
                 if date2 < date1:
                     query_output.add(date_id.encode())
+                else:
+                    break
 
             elif operator == '>=':
                 if date2 >= date1:
@@ -190,6 +192,8 @@ def query_date(dte):
             elif operator == '<=':
                 if date2 <= date1:
                     query_output.add(date_id.encode())
+                else:
+                    break
             else:
                 break
 
