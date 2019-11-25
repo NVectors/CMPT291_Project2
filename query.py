@@ -2,7 +2,7 @@
 
 
 from bsddb3 import db
-import sys
+from datetime import datetime as dt
 import query_parser as parser
 
 # Instances of BerkeleyDB
@@ -29,8 +29,6 @@ dateCursor = dateDB.cursor()
 recCursor = recDB.cursor()
 
 
-
-
 def query(q):
     operations = parser.rec_parse(q)
     result = ['brief']
@@ -48,7 +46,6 @@ def query(q):
             result[0] = op[1]
             continue
 
-
         if op[0] == "term":
             result = result + query_term(op[1])
             continue
@@ -59,6 +56,8 @@ def query(q):
 """
 Term in the form (pre, term, post)
 """
+
+
 def query_term(term):
     if term[0] == "body":
         search = [b"b-"]
@@ -71,7 +70,7 @@ def query_term(term):
     last = None
     for s in search:
         q = termCursor.set(s + term[1].encode())
-        
+
         if not q:
             continue
 
@@ -79,16 +78,13 @@ def query_term(term):
             result.append(q[1])
             q = termCursor.next_dup()
 
-
-        # cursor should be pointing at last exaxt match
+        # cursor should be pointing at last exact match
         nxt = termCursor.next()
         t = term[1].encode()
         while nxt:
-            if s + t == nxt[0][0 : len(s+t)]:
+            if s + t == nxt[0][0: len(s + t)]:
                 result.append(nxt[1])
             nxt = termCursor.next()
-
-
 
     # Got list of row id's now. Translate them to email records.
     for i in range(len(result)):
@@ -96,38 +92,12 @@ def query_term(term):
 
     return result
 
-            
-        
-def termSearch(queryTerm, cursor):
-    # TODO Range search if we have wild card % example confidential% as in confidential, confidentially, confidentiality
-    # TODO termSearch
-    wildcard = queryTerm[-1]
 
-    if wildcard == '%':
-        pass
-    else:
-        query_output = set()
-
-        result = cursor.set(queryTerm.encode("UTF-8"))
-        row_ids = result[1].decode('UTF-8').split(',')
-        term_id = row_ids[0]
-
-        query_output.add(term_id)
-
-        dup = cursor.next_dup()
-        while dup is not None:
-            dup_row_ids = dup[1].decode('UTF-8').split(',')
-            dup_term_id = dup_row_ids[0]
-            query_output.add(dup_term_id)
-            dup = cursor.next_dup()
-
-        return query_output
-
-
-def emailQuery(queryTerm, cursor):
+def query_email(email):
     query_output = set()
+    cursor = emailCursor
 
-    result = cursor.set(queryTerm.encode("UTF-8"))
+    result = cursor.set(email.encode("UTF-8"))
     row_ids = result[1].decode('UTF-8').split(',')
     email_id = row_ids[0]
 
@@ -140,10 +110,36 @@ def emailQuery(queryTerm, cursor):
         query_output.add(dup_email_id)
         dup = cursor.next_dup()
 
+    return query_output  # Returns row id's for now
+
+
+def query_date(date, operator):
+    query_output = set()
+
+    if operator in ("=", ">", ">="):
+        result = dateCursor.set(date.encode('UTF-8'))
+        while result is not None:
+            row_value = result[0].decode('UTF-8').split(',')
+            date_value = row_value[0]
+            value = result[1].decode('UTF-8').split(',')
+            date_id = value[0]
+
+            date1 = dt.strptime(date, "%Y/%m/%d")
+            date2 = dt.strptime(date_value, "%Y/%m/%d")
+            if operator == '=':
+                if date2 == date1:
+                    query_output.add(date_id)
+            elif operator == '>=':
+                if date2 >= date1:
+                    query_output.add(date_id)
+            elif operator is '>':
+                if date2 > date1:
+                    query_output.add(date_id)
+
+            result = dateCursor.next()
+
     return query_output
 
-def dateQuery(queryTerm, cursor):
-    query_output = set()
 
 def recSearch(index, cursor):
     result = cursor.set(index.encode("UTF-8"))
@@ -152,23 +148,18 @@ def recSearch(index, cursor):
     print(record)
 
 
-
 def exit():
     termDB.close()
     emailDB.close()
     dateDB.close()
     recDB.close()
 
-# test = termSearch('s-confidential', termCursor)
-# for t in test:
-#    recSearch(t,recCursor)
 
-#test = termSearch('s-confidential', termCursor)
-#output(test, recCursor, "Brief")
-
+test = query_date('2001/03/15', '>=')
+print(len(test))
 
 # Close Databases when done
-#termDB.close()
-#emailDB.close()
-#dateDB.close()
-#recDB.close()
+# termDB.close()
+# emailDB.close()
+# dateDB.close()
+# recDB.close()
