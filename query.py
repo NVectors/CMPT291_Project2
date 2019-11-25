@@ -31,41 +31,33 @@ dateCursor = dateDB.cursor()
 recCursor = recDB.cursor()
 
 
-
-
 def query(q):
     operations = parser.rec_parse(q)
     ids = set()
     mode = 'brief'
     for op in operations:
         if op[0] == "email":
-            new_ids = queryEmail(op[1])
+            new_ids = query_email(op[1])
             if len(ids) < 1:
                 ids = new_ids
             else:
                 ids = ids.intersection(new_ids)
             continue
-            
-        if op[0] == "date":
-            new_ids = query_date(op[1])
-            if len(ids) < 1:
-                ids = new_ids
-            else:
-                ids = ids.intersection(new_ids)
 
+        if op[0] == "date":
+            pass
 
         if op[0] == "mode":
             print("mode =", op[1])
             mode = op[1]
             continue
 
-
         if op[0] == "term":
             new_ids = query_term(op[1])
             if len(ids) < 1:
                 ids = new_ids
             else:
-                ids = ids.intersection(new_ids) 
+                ids = ids.intersection(new_ids)
             continue
 
     # Got set of row id's now. Translate them to email records.
@@ -78,10 +70,11 @@ def query(q):
     return result
 
 
+"""
+term in the form (pre, term, post)
+"""
 
-"""
-Term in the form (pre, term, post)
-"""
+
 def query_term(term):
     print("term =", term)
     if term[0] == "body":
@@ -95,7 +88,7 @@ def query_term(term):
     last = None
     for s in search:
         q = termCursor.set(s + term[1].encode())
-        
+
         if not q:
             continue
 
@@ -103,53 +96,35 @@ def query_term(term):
             result.add(q[1])
             q = termCursor.next_dup()
 
-
         # cursor should be pointing at last exaxt match
         nxt = termCursor.next()
         t = term[1].encode()
         while nxt:
-            if s + t == nxt[0][0 : len(s+t)]:
+            if s + t == nxt[0][0: len(s + t)]:
                 result.add(nxt[1])
             nxt = termCursor.next()
 
-
     return result
 
-            
-        
-def termSearch(queryTerm, cursor):
-    # TODO Range search if we have wild card % example confidential% as in confidential, confidentially, confidentiality
-    # TODO termSearch
-    wildcard = queryTerm[-1]
 
-    if wildcard == '%':
-        pass
-    else:
-        query_output = set()
-
-        result = cursor.set(queryTerm.encode("UTF-8"))
-        row_ids = result[1].decode('UTF-8').split(',')
-        term_id = row_ids[0]
-
-        query_output.add(term_id)
-
-        dup = cursor.next_dup()
-        while dup is not None:
-            dup_row_ids = dup[1].decode('UTF-8').split(',')
-            dup_term_id = dup_row_ids[0]
-            query_output.add(dup_term_id)
-            dup = cursor.next_dup()
-
-        return query_output
+"""
+email in form (operator, email)
+"""
 
 
 def query_email(eml):
-    operator = eml[0]
-    email = eml[1]
+    print("email =", eml, type(eml))
+    if eml[0] == "from":
+        search = [b"from-"]
+    elif eml[0] == 'to':
+        search = [b"to-"]
+    elif eml[0] == 'cc':
+        search = [b"cc-"]
+    elif eml[0] == 'bcc':
+        search = [b"bcc-"]
 
     query_output = set()
-
-    result = emailCursor.set(email.encode("UTF-8"))
+    result = emailCursor.set(search[0] + eml[1].encode('UTF-8'))
     row_ids = result[1].decode('UTF-8').split(',')
     email_id = row_ids[0]
 
@@ -157,14 +132,16 @@ def query_email(eml):
 
     dup = emailCursor.next_dup()
     while dup is not None:
-        dup_row_ids = dup[1].decode('UTF-8').split(',')
+        dup_row_ids = dup[1].decode("UTF-8").split(',')
         dup_email_id = dup_row_ids[0]
         query_output.add(dup_email_id)
         dup = emailCursor.next_dup()
 
     return query_output
 
+
 def query_date(dte):
+    #TODO Make this query fn
     operator = dte[0]
     date = dte[1]
 
@@ -194,30 +171,9 @@ def query_date(dte):
 
     return query_output
 
-def recSearch(index, cursor):
-    result = cursor.set(index.encode("UTF-8"))
-    records = result[1].decode('UTF-8').split(',')
-    record = records[0]
-    print(record)
-
-
 
 def exit():
     termDB.close()
     emailDB.close()
     dateDB.close()
     recDB.close()
-
-# test = termSearch('s-confidential', termCursor)
-# for t in test:
-#    recSearch(t,recCursor)
-
-#test = termSearch('s-confidential', termCursor)
-#output(test, recCursor, "Brief")
-
-
-# Close Databases when done
-#termDB.close()
-#emailDB.close()
-#dateDB.close()
-#recDB.close()
