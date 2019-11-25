@@ -12,7 +12,7 @@ def main():
             query.exit()
             raise SystemExit
 
-        user_input = user_input.replace(" ", '')
+        #user_input = user_input.replace(" ", '')
         results = query.query(user_input)
         print_results(results)
 

@@ -33,11 +33,13 @@ recCursor = recDB.cursor()
 
 def query(q):
     operations = parser.rec_parse(q)
+    if not operations:
+        return set()
     ids = set()
     mode = 'brief'
     for op in operations:
         if op[0] == "email":
-            new_ids = queryEmail(op[1])
+            new_ids = query_email(op[1])
             if len(ids) < 1:
                 ids = new_ids
             else:

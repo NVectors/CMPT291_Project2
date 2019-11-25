@@ -135,7 +135,11 @@ returns : None | index of last char in email
 """
 def is_email(Str):
     p1 = is_email_term(Str)
+    if p1 + 1 >= len(Str):
+        return None
     if not p1 or Str[p1 + 1] != '@':
+        return None
+    if p1 +2 >= len(Str):
         return None
     p2 = is_email_term(Str[p1 + 2:])
     if not p2:
@@ -178,6 +182,7 @@ returns : None | (index of last char in email, (operator, email))
 """
 def is_email_query(Str):
     pre = is_email_pre(Str)
+    print(pre)
     if not pre:
         return None
     eml_start = None
@@ -221,10 +226,11 @@ def is_term_pre(Str):
     if Str[0:4] not in TERM_PRE:
         return None
     end = 4
-    for c in range(5, len(Str)):
+    for c in range(4, len(Str)):
         if Str[c] not in WHITESPACE:
             break
         end += 1
+    print(end)
     if Str[end] != ':':
         return None
 
@@ -237,6 +243,7 @@ returns : None | (index of last char in term query, (pre, term, post) )
 """
 def is_term_query(Str):
     pre = is_term_pre(Str)
+    print("pre =", pre)
     end = 0
     if not pre:
         term_start = 0
