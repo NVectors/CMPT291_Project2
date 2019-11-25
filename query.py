@@ -2,7 +2,7 @@
 
 
 from bsddb3 import db
-from datetime import datetime as dt
+import sys
 import query_parser as parser
 
 # Instances of BerkeleyDB
@@ -29,6 +29,8 @@ dateCursor = dateDB.cursor()
 recCursor = recDB.cursor()
 
 
+
+
 def query(q):
     operations = parser.rec_parse(q)
     ids = set()
@@ -48,12 +50,13 @@ def query(q):
             mode = op[1]
             continue
 
+
         if op[0] == "term":
             new_ids = query_term(op[1])
             if len(ids) < 1:
                 ids = new_ids
             else:
-                ids = ids.intersection(new_ids)
+                ids = ids.intersection(new_ids) 
             continue
 
     # Got set of row id's now. Translate them to email records.
@@ -64,11 +67,10 @@ def query(q):
     return result
 
 
+
 """
 Term in the form (pre, term, post)
 """
-
-
 def query_term(term):
     print("term =", term)
     if term[0] == "body":
@@ -82,7 +84,7 @@ def query_term(term):
     last = None
     for s in search:
         q = termCursor.set(s + term[1].encode())
-
+        
         if not q:
             continue
 
@@ -96,13 +98,17 @@ def query_term(term):
         nxt = termCursor.next()
         t = term[1].encode()
         while nxt:
-            if s + t == nxt[0][0: len(s + t)]:
+            if s + t == nxt[0][0 : len(s+t)]:
                 result.add(nxt[1])
             nxt = termCursor.next()
 
+
+
+
     return result
 
-
+            
+        
 def emailQuery(queryTerm, cursor):
     query_output = set()
 
@@ -121,40 +127,15 @@ def emailQuery(queryTerm, cursor):
 
     return query_output
 
-
-def query_date(date, operator):
+def dateQuery(queryTerm, cursor):
     query_output = set()
-
-    if operator in ("=", ">", ">="):
-        result = dateCursor.set(date.encode('UTF-8'))
-        while result is not None:
-            row_value = result[0].decode('UTF-8').split(',')
-            date_value = row_value[0]
-            value = result[1].decode('UTF-8').split(',')
-            date_id = value[0]
-
-            date1 = dt.strptime(date, "%Y/%m/%d")
-            date2 = dt.strptime(date_value, "%Y/%m/%d")
-            if operator == '=':
-                if date2 == date1:
-                    query_output.add(date_id)
-            elif operator == '>=':
-                if date2 >= date1:
-                    query_output.add(date_id)
-            elif operator is '>':
-                if date2 > date1:
-                    query_output.add(date_id)
-
-            result = dateCursor.next()
-
-    return query_output
-
 
 def recSearch(index, cursor):
     result = cursor.set(index.encode("UTF-8"))
     records = result[1].decode('UTF-8').split(',')
     record = records[0]
     print(record)
+
 
 
 def exit():
@@ -167,12 +148,12 @@ def exit():
 # for t in test:
 #    recSearch(t,recCursor)
 
-# test = termSearch('s-confidential', termCursor)
-# output(test, recCursor, "Brief")
+#test = termSearch('s-confidential', termCursor)
+#output(test, recCursor, "Brief")
 
 
 # Close Databases when done
-# termDB.close()
-# emailDB.close()
-# dateDB.close()
-# recDB.close()
+#termDB.close()
+#emailDB.close()
+#dateDB.close()
+#recDB.close()
