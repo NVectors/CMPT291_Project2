@@ -143,7 +143,7 @@ def query_date(dte):
 
     query_output = set()
 
-    if operator in ("", ">", ">=", "<="):
+    if operator in (":", ">", ">=", "<="):
         result = dateCursor.set(date.encode('UTF-8'))
 
         while result is not None:
