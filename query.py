@@ -28,7 +28,26 @@ recCursor = recDB.cursor()
 
 
 def query(q):
-    pass
+    operations = parser.rec_parse(q)
+    result = []
+    for op in operations:
+        if op[0] == "email":
+            #do call email query stuff here
+            # Maybe result.append("My result string")
+            pass
+
+        if op[0] == "date":
+            #do date stuff
+            pass
+
+        if op[0] == "mode":
+            #do mode stuff
+            pass
+
+        if op[0] == "term":
+            # Do term stuff 
+
+            pass
 
 
 
