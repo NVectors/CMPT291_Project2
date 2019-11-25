@@ -19,3 +19,4 @@ Sources of Information:
 		For loop in Shell : https://www.cyberciti.biz/faq/bash-loop-over-file/
 		db_load : https://docs.oracle.com/cd/E17276_01/html/api_reference/C/db_load.html
 		db_dump : https://docs.oracle.com/cd/E17275_01/html/api_reference/C/db_dump.html
+
