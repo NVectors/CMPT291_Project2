@@ -103,21 +103,21 @@ def query_term(term):
     return result
 
 
-def query_email(email):
+def emailQuery(queryTerm, cursor):
     query_output = set()
 
-    result = emailCursor.set(email.encode("UTF-8"))
+    result = cursor.set(queryTerm.encode("UTF-8"))
     row_ids = result[1].decode('UTF-8').split(',')
     email_id = row_ids[0]
 
     query_output.add(email_id)
 
-    dup = emailCursor.next_dup()
+    dup = cursor.next_dup()
     while dup is not None:
         dup_row_ids = dup[1].decode('UTF-8').split(',')
         dup_email_id = dup_row_ids[0]
         query_output.add(dup_email_id)
-        dup = emailCursor.next_dup()
+        dup = cursor.next_dup()
 
     return query_output
 
