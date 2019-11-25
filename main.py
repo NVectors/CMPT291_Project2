@@ -9,12 +9,12 @@ def main():
         user_input = input("Query: ").lower()
         if user_input == 'q':
             print("Exiting")
+            query.exit()
             raise SystemExit
 
         user_input = user_input.replace(" ", '')
         results = query.query(user_input)
         print_results(results)
-        query.exit()
 
 
 def print_results(results):
