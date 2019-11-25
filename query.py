@@ -33,7 +33,8 @@ recCursor = recDB.cursor()
 
 def query(q):
     operations = parser.rec_parse(q)
-    result = ['brief']
+    ids = set()
+    mode = 'brief'
     for op in operations:
         if op[0] == "email":
             # do call email query stuff here
@@ -45,12 +46,17 @@ def query(q):
             pass
 
         if op[0] == "mode":
-            result[0] = op[1]
+            print("mode =", op[1])
+            mode = op[1]
             continue
 
 
         if op[0] == "term":
-            result = result + query_term(op[1])
+            new_ids = query_term(op[1])
+            if len(ids) < 1:
+                ids = new_ids
+            else:
+                ids = ids.intersection(new_ids) 
             continue
 
     # Got set of row id's now. Translate them to email records.
@@ -63,10 +69,12 @@ def query(q):
     return result
 
 
+
 """
 Term in the form (pre, term, post)
 """
 def query_term(term):
+    print("term =", term)
     if term[0] == "body":
         search = [b"b-"]
     elif term[0] == 'subj':
@@ -74,7 +82,7 @@ def query_term(term):
     else:
         search = [b"s-", b"b-"]
 
-    result = []
+    result = set()
     last = None
     for s in search:
         q = termCursor.set(s + term[1].encode())
@@ -83,7 +91,7 @@ def query_term(term):
             continue
 
         while q:
-            result.append(q[1])
+            result.add(q[1])
             q = termCursor.next_dup()
 
 
@@ -92,14 +100,9 @@ def query_term(term):
         t = term[1].encode()
         while nxt:
             if s + t == nxt[0][0 : len(s+t)]:
-                result.append(nxt[1])
+                result.add(nxt[1])
             nxt = termCursor.next()
 
-
-
-    # Got list of row id's now. Translate them to email records.
-    for i in range(len(result)):
-        result[i] = recCursor.set(result[i])[1].decode('utf-8')
 
     return result
 
