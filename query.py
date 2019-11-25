@@ -33,7 +33,7 @@ def query(q):
     if not operations:
         return set()
     ids = set()
-    mode = 'brief'
+    mode = None
     for op in operations:
         if op[0] == "email":
             new_ids = query_email(op[1])
@@ -58,8 +58,9 @@ def query(q):
     result = set()
     for id in ids:
         result.add(recCursor.set(id)[1].decode('utf-8'))
-
-    result.add(mode)
+    
+    if mode:
+        result.add(mode)
 
     return result
 
