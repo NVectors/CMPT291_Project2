@@ -141,7 +141,8 @@ def is_email(Str):
     if not p2:
         return None
 
-    return p1 + 1 + p2 + 1
+    # +2 because p1 and p2 are 0-indexed and we need one more for the @
+    return p1 + p2 + 2 
 
 
 """
@@ -192,7 +193,7 @@ def is_email_query(Str):
     if not eml_end:
         return None
 
-    return (eml_start + eml_end, (pre[0], Str[eml_start : eml_end + 1]))
+    return (eml_start + eml_end, (pre[0], Str[eml_start : eml_start + eml_end + 1]))
 
 
 """
