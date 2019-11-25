@@ -2,7 +2,7 @@
 
 
 from bsddb3 import db
-from datetime import datetime as dt
+import sys
 import query_parser as parser
 
 # Instances of BerkeleyDB
@@ -29,9 +29,12 @@ dateCursor = dateDB.cursor()
 recCursor = recDB.cursor()
 
 
+
+
 def query(q):
     operations = parser.rec_parse(q)
-    result = ['brief']
+    ids = set()
+    mode = 'brief'
     for op in operations:
         if op[0] == "email":
             # do call email query stuff here
@@ -43,22 +46,33 @@ def query(q):
             pass
 
         if op[0] == "mode":
-            result[0] = op[1]
+            print("mode =", op[1])
+            mode = op[1]
             continue
+
 
         if op[0] == "term":
-            result = result + query_term(op[1])
+            new_ids = query_term(op[1])
+            if len(ids) < 1:
+                ids = new_ids
+            else:
+                ids = ids.intersection(new_ids) 
             continue
 
+    # Got set of row id's now. Translate them to email records.
+    result = set()
+    for id in ids:
+        result.add(recCursor.set(id)[1].decode('utf-8'))
+
     return result
+
 
 
 """
 Term in the form (pre, term, post)
 """
-
-
 def query_term(term):
+    print("term =", term)
     if term[0] == "body":
         search = [b"b-"]
     elif term[0] == 'subj':
@@ -66,38 +80,39 @@ def query_term(term):
     else:
         search = [b"s-", b"b-"]
 
-    result = []
+    result = set()
     last = None
     for s in search:
         q = termCursor.set(s + term[1].encode())
-
+        
         if not q:
             continue
 
         while q:
-            result.append(q[1])
+            result.add(q[1])
             q = termCursor.next_dup()
 
-        # cursor should be pointing at last exact match
+        if not term[2]:
+            continue
+        # cursor should be pointing at last exaxt match
         nxt = termCursor.next()
         t = term[1].encode()
         while nxt:
-            if s + t == nxt[0][0: len(s + t)]:
-                result.append(nxt[1])
+            if s + t == nxt[0][0 : len(s+t)]:
+                result.add(nxt[1])
             nxt = termCursor.next()
 
-    # Got list of row id's now. Translate them to email records.
-    for i in range(len(result)):
-        result[i] = recCursor.set(result[i])[1].decode('utf-8')
+
+
 
     return result
 
-
-def query_email(email):
+            
+        
+def emailQuery(queryTerm, cursor):
     query_output = set()
-    cursor = emailCursor
 
-    result = cursor.set(email.encode("UTF-8"))
+    result = cursor.set(queryTerm.encode("UTF-8"))
     row_ids = result[1].decode('UTF-8').split(',')
     email_id = row_ids[0]
 
@@ -110,36 +125,10 @@ def query_email(email):
         query_output.add(dup_email_id)
         dup = cursor.next_dup()
 
-    return query_output  # Returns row id's for now
-
-
-def query_date(date, operator):
-    query_output = set()
-
-    if operator in ("=", ">", ">="):
-        result = dateCursor.set(date.encode('UTF-8'))
-        while result is not None:
-            row_value = result[0].decode('UTF-8').split(',')
-            date_value = row_value[0]
-            value = result[1].decode('UTF-8').split(',')
-            date_id = value[0]
-
-            date1 = dt.strptime(date, "%Y/%m/%d")
-            date2 = dt.strptime(date_value, "%Y/%m/%d")
-            if operator == '=':
-                if date2 == date1:
-                    query_output.add(date_id)
-            elif operator == '>=':
-                if date2 >= date1:
-                    query_output.add(date_id)
-            elif operator is '>':
-                if date2 > date1:
-                    query_output.add(date_id)
-
-            result = dateCursor.next()
-
     return query_output
 
+def dateQuery(queryTerm, cursor):
+    query_output = set()
 
 def recSearch(index, cursor):
     result = cursor.set(index.encode("UTF-8"))
@@ -148,18 +137,23 @@ def recSearch(index, cursor):
     print(record)
 
 
+
 def exit():
     termDB.close()
     emailDB.close()
     dateDB.close()
     recDB.close()
 
+# test = termSearch('s-confidential', termCursor)
+# for t in test:
+#    recSearch(t,recCursor)
 
-test = query_date('2001/03/15', '>=')
-print(len(test))
+#test = termSearch('s-confidential', termCursor)
+#output(test, recCursor, "Brief")
+
 
 # Close Databases when done
-# termDB.close()
-# emailDB.close()
-# dateDB.close()
-# recDB.close()
+#termDB.close()
+#emailDB.close()
+#dateDB.close()
+#recDB.close()

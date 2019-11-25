@@ -14,6 +14,7 @@ def main():
         results = query.query(user_input)
         #result = query.test(nput)
         print_results(results)
+    query.exit()
 
 
 
@@ -22,13 +23,13 @@ def print_results(results):
         print(("-" * 35) + "No Records" + ("-" * 35))
         return
     # TODO De-escape data
-    if results[0] == 'full':
-        full = True
-    else:
-        full = False
+    full = 'full' in results
 
 
-    for result in results[1:]:
+    for result in results:
+        if result == 'full' or result == 'brief':
+            continue
+
         print("-" * 80)
 
         try: print("Row ID =",  re.findall('<row>(.*)</row>', result)[0])
