@@ -249,9 +249,10 @@ def is_term_query(Str):
         if Str[c] not in WHITESPACE:
             term_start = c
             break
-    term_end = is_term(Str[term_start :]) + term_start
-    if not term_end:
+    t =  is_term(Str[term_start :])
+    if not t:
         return None
+    term_end = t + term_start
 
     if term_end < len(Str):
         suf = Str[term_end] == '%'
