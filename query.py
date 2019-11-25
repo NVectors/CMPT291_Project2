@@ -2,6 +2,7 @@
 
 
 from bsddb3 import db
+from datetime import datetime
 import query_parser as parser
 
 # Instances of BerkeleyDB
@@ -44,7 +45,9 @@ def query(q):
             continue
 
         if op[0] == "date":
-            pass
+            query_date(op[1])
+            #if len(ids) < 1:
+            #    ids = new_ids
 
         if op[0] == "mode":
             print("mode =", op[1])
@@ -154,34 +157,41 @@ def query_date(dte):
             value = result[1].decode('UTF-8').split(',')
             date_id = value[0]
 
-            date1 = dt.strptime(date, "%Y/%m/%d")
-            date2 = dt.strptime(date_value, "%Y/%m/%d")
+            sd1 = date.split('/')
+            sd2 = date_value.split('/')
+
+            #TODO what the fuck
+            date1 = datetime.date(sd1[0], sd1[1], sd1[2])
+            date2 = datetime.date(sd2[0], sd2[1], sd2[2])
+
+            print(date1, date2)
 
             if operator == ':':
                 if date2 == date1:
-                    query_output.add(date_id)
+                    query_output.add(date_id.encode())
 
             elif operator is '>':
                 if date2 > date1:
-                    query_output.add(date_id)
+                    query_output.add(date_id.encode())
 
             elif operator is '<':
                 if date2 < date1:
-                    query_output.add(date_id)
+                    query_output.add(date_id.encode())
 
             elif operator == '>=':
                 if date2 >= date1:
-                    query_output.add(date_id)
+                    query_output.add(date_id.encode())
 
             elif operator == '<=':
                 if date2 <= date1:
-                    query_output.add(date_id)
+                    query_output.add(date_id.encode())
             else:
                 break
 
             result = dateCursor.next()
 
     return query_output
+
 
 def exit():
     termDB.close()
