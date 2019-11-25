@@ -27,6 +27,11 @@ dateCursor = dateDB.cursor()
 recCursor = recDB.cursor()
 
 
+def query(q):
+    pass
+
+
+
 def termSearch(queryTerm, cursor):
     # TODO Range search if we have wild card % example confidential% as in confidential, confidentially, confidentiality
     # TODO termSearch
