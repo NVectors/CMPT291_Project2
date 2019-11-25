@@ -1,0 +1,16 @@
+to make queries:
+./main.py
+enter a query when prompted or type q to quit
+
+
+algorithm for eveluating queries:
+user input it gathered
+A recursive parseing function called rec_parse is used.  It takes a string and
+returns either None or a list of tuples of the form (query_type, val)
+
+The function goes through trying to eveluate the string as all the query types (mode, date, etc)
+If the begining or entire string evaluates as one of the types, then the function calls itself on the 
+remaining substring, appending the (query_type, val) to the list returned from the recursive call
+the base case for the function is when string length is 0
+
+
