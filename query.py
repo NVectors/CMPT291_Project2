@@ -5,6 +5,8 @@ from bsddb3 import db
 import sys
 import query_parser as parser
 
+from datetime import datetime
+
 # Instances of BerkeleyDB
 termDB = db.DB()
 emailDB = db.DB()
