@@ -37,6 +37,11 @@ def query(q):
     for op in operations:
         if op[0] == "email":
             new_ids = query_email(op[1])
+            if len(ids) < 1:
+                ids = new_ids
+            else:
+                ids = ids.intersection(new_ids)
+            continue
 
         if op[0] == "date":
             pass
@@ -121,13 +126,13 @@ def query_email(eml):
     row_ids = result[1].decode('UTF-8').split(',')
     email_id = row_ids[0]
 
-    query_output.add(email_id)
+    query_output.add(email_id.encode())
 
     dup = emailCursor.next_dup()
     while dup is not None:
         dup_row_ids = dup[1].decode("UTF-8").split(',')
         dup_email_id = dup_row_ids[0]
-        query_output.add(dup_email_id)
+        query_output.add(dup_email_id.encode())
         dup = emailCursor.next_dup()
 
     return query_output
@@ -177,7 +182,6 @@ def query_date(dte):
             result = dateCursor.next()
 
     return query_output
-
 
 def exit():
     termDB.close()
