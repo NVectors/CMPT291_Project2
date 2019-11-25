@@ -257,9 +257,11 @@ def is_term_query(Str):
         if Str[c] not in WHITESPACE:
             term_start = c
             break
+        end += 1
     t =  is_term(Str[term_start :])
     if not t:
         return None
+    print("t=", t)
     term_end = t + term_start
     end += t
 
@@ -273,6 +275,8 @@ def is_term_query(Str):
 
 
     val = (pre_val, Str[term_start : term_end], suf)
+    print("myval=", val)
+    print("myend=", end)
 
     return (end, val)
 
