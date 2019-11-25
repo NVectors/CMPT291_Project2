@@ -2,17 +2,19 @@
 
 import query
 import re
+import time
 
 
 def main():
     while True:
         user_input = input("Query: ").lower()
-        if user_input == 'q':
+        if user_input == 'q' or user_input == 'exit':
             print("Exiting")
+            # time.sleep(3) # if you want the user to see the words exit before the terminal closes
             query.exit()
             raise SystemExit
 
-        #user_input = user_input.replace(" ", '')
+        user_input = user_input.replace(" ", '') # leave this in, just in case the equivalent stops working in the parser
         results = query.query(user_input)
         print_results(results)
 
