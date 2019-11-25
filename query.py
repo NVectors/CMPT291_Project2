@@ -124,26 +124,50 @@ def termSearch(queryTerm, cursor):
         return query_output
 
 
-def emailQuery(queryTerm, cursor):
+def query_email(email):
     query_output = set()
 
-    result = cursor.set(queryTerm.encode("UTF-8"))
+    result = emailCursor.set(email.encode("UTF-8"))
     row_ids = result[1].decode('UTF-8').split(',')
     email_id = row_ids[0]
 
     query_output.add(email_id)
 
-    dup = cursor.next_dup()
+    dup = emailCursor.next_dup()
     while dup is not None:
         dup_row_ids = dup[1].decode('UTF-8').split(',')
         dup_email_id = dup_row_ids[0]
         query_output.add(dup_email_id)
-        dup = cursor.next_dup()
+        dup = emailCursor.next_dup()
 
     return query_output
 
-def dateQuery(queryTerm, cursor):
+def query_date(date, operator):
     query_output = set()
+
+    if operator in ("=", ">", ">="):
+        result = dateCursor.set(date.encode('UTF-8'))
+        while result is not None:
+            row_value = result[0].decode('UTF-8').split(',')
+            date_value = row_value[0]
+            value = result[1].decode('UTF-8').split(',')
+            date_id = value[0]
+
+            date1 = dt.strptime(date, "%Y/%m/%d")
+            date2 = dt.strptime(date_value, "%Y/%m/%d")
+            if operator == '=':
+                if date2 == date1:
+                    query_output.add(date_id)
+            elif operator == '>=':
+                if date2 >= date1:
+                    query_output.add(date_id)
+            elif operator is '>':
+                if date2 > date1:
+                    query_output.add(date_id)
+
+            result = dateCursor.next()
+
+    return query_output
 
 def recSearch(index, cursor):
     result = cursor.set(index.encode("UTF-8"))
