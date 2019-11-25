@@ -64,6 +64,8 @@ def query(q):
     for id in ids:
         result.add(recCursor.set(id)[1].decode('utf-8'))
 
+    result.add(mode)
+
     return result
 
 
