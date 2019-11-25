@@ -2,6 +2,7 @@
 
 import query
 import re
+import time
 
 
 def main():
@@ -9,6 +10,7 @@ def main():
         user_input = input("Query: ").lower()
         if user_input == 'q' or user_input == 'exit':
             print("Exiting")
+            # time.sleep(3) # if you want the user to see the words exit before the terminal closes
             query.exit()
             raise SystemExit
 
