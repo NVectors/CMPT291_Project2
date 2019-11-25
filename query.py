@@ -37,13 +37,20 @@ def query(q):
     mode = 'brief'
     for op in operations:
         if op[0] == "email":
-            # do call email query stuff here
-            # Maybe result.append("My result string")
-            pass
-
+            new_ids = queryEmail(op[1])
+            if len(ids) < 1:
+                ids = new_ids
+            else:
+                ids = ids.intersection(new_ids)
+            continue
+            
         if op[0] == "date":
-            # do date stuff
-            pass
+            new_ids = query_date(op[1])
+            if len(ids) < 1:
+                ids = new_ids
+            else:
+                ids = ids.intersection(new_ids)
+
 
         if op[0] == "mode":
             print("mode =", op[1])
@@ -134,7 +141,10 @@ def termSearch(queryTerm, cursor):
         return query_output
 
 
-def query_email(email):
+def query_email(eml):
+    operator = eml[0]
+    email = eml[1]
+
     query_output = set()
 
     result = emailCursor.set(email.encode("UTF-8"))
@@ -152,7 +162,10 @@ def query_email(email):
 
     return query_output
 
-def query_date(date, operator):
+def query_date(dte):
+    operator = dte[0]
+    date = dte[1]
+
     query_output = set()
 
     if operator in ("=", ">", ">="):
