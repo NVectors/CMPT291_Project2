@@ -4,6 +4,8 @@ import query
 import re
 import time
 
+OUTPUT = 'brief'
+
 
 def main():
     while True:
@@ -20,11 +22,19 @@ def main():
 
 
 def print_results(results):
+    global OUTPUT
+
+    if 'full' in results:
+        OUTPUT = 'full'
+    if 'brief' in results:
+        OUTPUT = 'brief'
+
+    full = OUTPUT == 'full'
     if len(results) < 2:
         print(("-" * 35) + "No Records" + ("-" * 35))
         return
-    # TODO De-escape data
-    full = 'full' in results
+
+
 
     for result in results:
         if result == 'full' or result == 'brief':

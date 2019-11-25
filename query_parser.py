@@ -229,7 +229,8 @@ def is_term_pre(Str):
         if Str[c] not in WHITESPACE:
             break
         end += 1
-    if Str[end] != ':':
+
+    if end >= len(Str) or Str[end] != ':':
         return None
 
     return (Str[0:4], end)
