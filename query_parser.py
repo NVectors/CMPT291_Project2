@@ -112,7 +112,7 @@ Desc    : Checks if Str is an email term
 returns : None | index of last char in email term
 """
 def is_email_term(Str):
-    #TODO Figure out WTF alphanumeric+ is
+    #TODO Figure out alphanumeric+ is -> alphanumeric+ match one or more ASCII digits
     size = 0
     for c in range(len(Str)):
         if Str[c] != '.' and not Str[c].isalnum():
