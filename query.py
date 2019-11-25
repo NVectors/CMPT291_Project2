@@ -161,7 +161,7 @@ def query_date(dte):
             date1 = dt.strptime(date, "%Y/%m/%d")
             date2 = dt.strptime(date_value, "%Y/%m/%d")
             
-            if operator == '':
+            if operator == ':':
                 if date2 == date1:
                     query_output.add(date_id)
                     
