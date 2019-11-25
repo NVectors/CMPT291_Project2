@@ -14,7 +14,7 @@ def main():
             query.exit()
             raise SystemExit
 
-        #user_input = user_input.replace(" ", '')
+        user_input = user_input.replace(" ", '') # leave this in, just in case the equivalent stops working in the parser
         results = query.query(user_input)
         print_results(results)
 
