@@ -7,7 +7,7 @@ import re
 def main():
     while True:
         user_input = input("Query: ").lower()
-        if user_input == 'q':
+        if user_input == 'q' or user_input == 'exit':
             print("Exiting")
             query.exit()
             raise SystemExit
