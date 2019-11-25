@@ -53,6 +53,13 @@ def query(q):
             result = result + query_term(op[1])
             continue
 
+    # Got set of row id's now. Translate them to email records.
+    result = set()
+    for id in ids:
+        result.add(recCursor.set(id)[1].decode('utf-8'))
+
+    result.add(mode)
+
     return result
 
 
