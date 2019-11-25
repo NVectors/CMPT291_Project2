@@ -254,6 +254,7 @@ def is_term_query(Str):
     if not t:
         return None
     term_end = t + term_start
+    end += t
 
     if term_end < len(Str):
         suf = Str[term_end] == '%'
@@ -263,7 +264,6 @@ def is_term_query(Str):
     if suf:
         end += 1
 
-    end += term_end
 
     val = (pre_val, Str[term_start : term_end], suf)
 
@@ -309,7 +309,7 @@ def rec_parse(Str):
 
     date = is_date_query(Str)
     if date:
-        print("date")
+        print("paresing date")
         ret = rec_parse(Str[date[0] + 1 :])
         if ret == None:
             return None
@@ -317,7 +317,7 @@ def rec_parse(Str):
 
     mode = is_mode_change(Str)
     if mode:
-        print("mode")
+        print("parsesing mode")
         ret = rec_parse(Str[mode[0] + 1 :])
         if ret == None: 
             return None
@@ -325,7 +325,7 @@ def rec_parse(Str):
 
     email = is_email_query(Str)
     if email:
-        print("email")
+        print("parseing email")
         ret = rec_parse(Str[email[0] + 1 :])
         if ret == None:
             return None
@@ -333,7 +333,7 @@ def rec_parse(Str):
 
     term = is_term_query(Str)
     if term:
-        print("term")
+        print("parseing term")
         ret = rec_parse(Str[term[0] + 1 : ])
         if ret == None:
             return None
