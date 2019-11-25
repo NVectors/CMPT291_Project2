@@ -182,7 +182,6 @@ returns : None | (index of last char in email, (operator, email))
 """
 def is_email_query(Str):
     pre = is_email_pre(Str)
-    print(pre)
     if not pre:
         return None
     eml_start = None
@@ -230,7 +229,6 @@ def is_term_pre(Str):
         if Str[c] not in WHITESPACE:
             break
         end += 1
-    print(end)
     if Str[end] != ':':
         return None
 
@@ -243,7 +241,6 @@ returns : None | (index of last char in term query, (pre, term, post) )
 """
 def is_term_query(Str):
     pre = is_term_pre(Str)
-    print("pre =", pre)
     end = 0
     if not pre:
         term_start = 0
@@ -261,7 +258,6 @@ def is_term_query(Str):
     t =  is_term(Str[term_start :])
     if not t:
         return None
-    print("t=", t)
     term_end = t + term_start
     end += t
 
@@ -275,8 +271,6 @@ def is_term_query(Str):
 
 
     val = (pre_val, Str[term_start : term_end], suf)
-    print("myval=", val)
-    print("myend=", end)
 
     return (end, val)
 
@@ -310,8 +304,6 @@ Desc    : Recurrsively parse a string, getting nessesary info to perform a query
 returns : None | [(query_type, val), ...]
 """
 def rec_parse(Str):
-    print("len =", len(Str))
-    print("str =", Str)
     if len(Str) == 0:
         return []
 
@@ -320,7 +312,6 @@ def rec_parse(Str):
 
     date = is_date_query(Str)
     if date:
-        print("paresing date")
         ret = rec_parse(Str[date[0] + 1 :])
         if ret == None:
             return None
@@ -328,7 +319,6 @@ def rec_parse(Str):
 
     mode = is_mode_change(Str)
     if mode:
-        print("parsesing mode")
         ret = rec_parse(Str[mode[0] + 1 :])
         if ret == None: 
             return None
@@ -336,7 +326,6 @@ def rec_parse(Str):
 
     email = is_email_query(Str)
     if email:
-        print("parseing email")
         ret = rec_parse(Str[email[0] + 1 :])
         if ret == None:
             return None
@@ -344,7 +333,6 @@ def rec_parse(Str):
 
     term = is_term_query(Str)
     if term:
-        print("parseing term")
         ret = rec_parse(Str[term[0] + 1 : ])
         if ret == None:
             return None

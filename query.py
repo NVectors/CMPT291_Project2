@@ -70,7 +70,6 @@ term in the form (pre, term, post)
 
 
 def query_term(term):
-    print("term =", term)
     if term[0] == "body":
         search = [b"b-"]
     elif term[0] == 'subj':
